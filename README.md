@@ -1,20 +1,25 @@
 # Drift
 
-Drift creates a remote Chromium session using Cloudflare Browser Run and opens Cloudflare Live View for that session.
+Drift is a browser UI hosted by Cloudflare Workers. Website pages are rendered by a separate central Chromium server and displayed inside Drift as remote screenshots.
 
-- Cloudflare Worker name: `horizon-chromium`
-- Browser binding: `BROWSER`
-- Static site files: `public/`
+- Cloudflare Worker: `horizon-chromium`
 - Worker entry point: `src/index.js`
+- Static website: `public/`
+- Central Chromium service: repository `drift-chromium-server`
 
-Connect this repository to the existing Worker named `horizon-chromium`.
+## Connect the Chromium server
 
-Workers Builds settings:
-- Root directory: `/`
-- Build command: leave blank
-- Deploy command: `npx wrangler deploy`
-- Production branch: `main`
+Deploy the Docker service from the `TheCoder-creator/drift-chromium-server` repository to a container host. Set a private `DRIFT_SERVER_SECRET` on that host.
 
-The Worker name in `wrangler.jsonc` must match the Cloudflare Worker name exactly.
+In the Cloudflare dashboard, open the Worker `horizon-chromium` and add:
 
-Visitors enter a website address, the Worker creates a Browser Run session, opens the address in Chromium, and returns a short-lived Live View link. Live View links act like access credentials; do not share them publicly.
+- `BROWSER_SERVER_URL`: the HTTPS URL of your deployed Chromium service
+- `BROWSER_SERVER_SECRET`: the same private secret used by the server
+
+Add both as secrets/variables in the Worker settings. Never put the secret in this repository or in frontend code.
+
+## Deploy
+
+Keep this repository connected to the existing Worker named `horizon-chromium`. The production branch is `main`. The build command can be left blank; deploy with `npx wrangler deploy` if deploying manually.
+
+The Chromium host must support Docker and a long-running service. Free plans may sleep or have memory and usage limits. Test privately before sharing Drift. The server has temporary sessions and basic per-IP/session limits; this is not a hardened public proxy.

@@ -8,203 +8,131 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
-:root{--bg:#050505;--nav:#121212;--accent:#00eb84;--card:rgba(20,20,20,.95);--text:#fff;--border:#333;--glass:rgba(18,18,18,.94)}
+:root{--bg:#050505;--panel:#121212;--accent:#00eb84;--text:#fff;--border:#292929;--muted:#777}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
 button,input{font:inherit}
-#tab-bar{background:var(--glass);backdrop-filter:blur(12px);display:flex;padding:6px 10px 0;gap:5px;border-bottom:1px solid var(--border);min-height:39px;align-items:flex-end;flex-shrink:0}
-.tab{background:rgba(255,255,255,.04);padding:8px 12px;border-radius:8px 8px 0 0;font-size:12px;border:1px solid transparent;border-bottom:none;color:#777;min-width:105px;max-width:190px;display:flex;align-items:center;gap:9px;white-space:nowrap;overflow:hidden}
-.tab.active{background:#080808;border-color:var(--accent);color:var(--accent);font-weight:700}
-.tab span:first-of-type{overflow:hidden;text-overflow:ellipsis;flex:1}
-.tab-close{cursor:pointer;opacity:.55}
-.tab-close:hover{color:#ff5555;opacity:1}
-#add-tab{background:rgba(255,255,255,.06);border:1px dashed var(--border);color:#777;padding:7px 12px;border-radius:8px 8px 0 0;cursor:pointer}
-#add-tab:hover{border-color:var(--accent);color:var(--accent)}
-#nav-tools{background:var(--glass);backdrop-filter:blur(12px);padding:8px 10px;display:flex;gap:8px;border-bottom:1px solid var(--border);align-items:center;flex-shrink:0}
-.nav-btn{background:rgba(255,255,255,.06);border:1px solid var(--border);color:#ccc;width:36px;height:36px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-.nav-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(0,235,132,.08)}
-.nav-btn:disabled{opacity:.3;cursor:not-allowed}
-#address-wrap{flex:1;position:relative;min-width:0}
-#address{width:100%;padding:10px 16px;border-radius:20px;border:1px solid var(--border);background:rgba(26,26,26,.95);color:#fff;outline:none;font-size:13px}
-#address:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(0,235,132,.15)}
-#go{background:var(--accent);color:#000;border:0;border-radius:18px;padding:10px 17px;font-size:12px;font-weight:800;cursor:pointer}
-#go:hover{filter:brightness(1.12)}
-#status-bar{display:flex;gap:5px;padding:0 5px;font-size:12px;color:#888;align-items:center;white-space:nowrap}
-#status-dot{width:7px;height:7px;border-radius:50%;background:#666}
-#status-dot.online{background:var(--accent);box-shadow:0 0 8px var(--accent)}
-#viewport{flex:1;position:relative;overflow:hidden;background:#080808;min-height:0}
-#home-view{height:100%;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:10vh 20px 30px;overflow:auto;background:radial-gradient(ellipse at top,rgba(0,235,132,.07),transparent 52%)}
-.logo{font-size:clamp(58px,9vw,82px);font-weight:900;color:var(--accent);letter-spacing:-6px;text-shadow:0 0 40px rgba(0,235,132,.25);line-height:1}
-.logo-sub{font-size:11px;color:#555;letter-spacing:6px;text-transform:uppercase;margin-top:7px}
-.home-description{font-size:13px;color:#777;margin-top:22px;text-align:center}
-.mid-search{width:min(90%,620px);background:var(--card);padding:7px 7px 7px 19px;border-radius:50px;border:1px solid var(--border);display:flex;gap:10px;margin-top:24px;align-items:center;transition:.2s}
-.mid-search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,235,132,.1)}
-.mid-search i{color:#666}
-.mid-search input{flex:1;min-width:0;background:none;border:none;color:#fff;outline:none;font-size:14px;padding:9px 0}
-#home-go{background:var(--accent);color:#000;border:0;padding:11px 20px;border-radius:50px;font-weight:800;cursor:pointer;font-size:12px}
-.quick-title{margin-top:30px;font-size:10px;color:#555;text-transform:uppercase;letter-spacing:1.7px}
-.quick-links{display:flex;flex-wrap:wrap;justify-content:center;gap:9px;margin-top:12px}
-.quick-link{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);padding:10px 15px;border-radius:12px;color:#aaa;font-size:12px;cursor:pointer}
-.quick-link:hover{border-color:var(--accent);color:var(--accent);background:rgba(0,235,132,.06)}
-#browser-view{display:none;position:absolute;inset:0;background:#080808}
-#browser-view.active{display:block}
-#browser-frame{width:100%;height:100%;border:0;background:#fff;display:block}
-#loading{display:none;position:absolute;inset:0;z-index:5;background:rgba(5,5,5,.88);align-items:center;justify-content:center;flex-direction:column;gap:14px;color:#bbb;font-size:13px}
+#tabbar{height:40px;display:flex;align-items:flex-end;gap:6px;padding:5px 10px 0;background:#101010;border-bottom:1px solid #222;flex-shrink:0}
+.tab{background:#080808;border:1px solid var(--border);border-bottom:0;border-radius:8px 8px 0 0;padding:8px 14px;color:var(--accent);font-size:12px;min-width:130px}
+#newtab{height:29px;width:32px;border:1px solid #333;border-bottom:0;background:#171717;color:#aaa;border-radius:7px 7px 0 0;cursor:pointer}
+#toolbar{display:flex;align-items:center;gap:7px;padding:9px 12px;background:#101010;border-bottom:1px solid #222;flex-shrink:0}
+.nav{width:35px;height:35px;border-radius:9px;border:1px solid #303030;background:#191919;color:#ccc;cursor:pointer}
+.nav:hover,#go:hover{border-color:var(--accent);color:var(--accent)}
+#address{flex:1;min-width:0;height:36px;border-radius:20px;border:1px solid #303030;background:#1a1a1a;color:white;padding:0 15px;outline:none;font-size:13px}
+#address:focus{border-color:var(--accent)}
+#go{height:36px;padding:0 17px;border:0;border-radius:20px;background:var(--accent);color:#000;font-size:11px;font-weight:800;cursor:pointer}
+#status{font-size:10px;color:#888;white-space:nowrap;padding:0 4px}
+#main{position:relative;flex:1;min-height:0;overflow:hidden}
+#home{height:100%;overflow:auto;display:flex;flex-direction:column;align-items:center;padding:10vh 18px 30px;background:radial-gradient(ellipse at top,rgba(0,235,132,.07),transparent 55%)}
+.logo{font-size:clamp(58px,9vw,82px);font-weight:900;letter-spacing:-6px;color:var(--accent);line-height:1;text-shadow:0 0 35px #00eb8430}
+.sub{font-size:10px;color:#555;letter-spacing:5px;margin-top:8px}
+.desc{color:#777;font-size:13px;margin-top:23px}
+#searchrow{display:flex;gap:8px;width:min(620px,95%);margin-top:25px}
+#start{flex:1;min-width:0;background:#151515;border:1px solid #333;border-radius:24px;color:white;padding:14px 18px;outline:none}
+#start:focus{border-color:var(--accent)}
+#browse{background:var(--accent);border:0;border-radius:22px;padding:0 22px;font-size:12px;font-weight:800;cursor:pointer}
+.quicktitle{font-size:10px;letter-spacing:2px;color:#555;margin-top:32px}
+.quick{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;margin-top:13px}
+.quick button{background:#151515;border:1px solid #292929;color:#aaa;border-radius:10px;padding:10px 15px;font-size:12px;cursor:pointer}
+.quick button:hover{border-color:var(--accent);color:var(--accent)}
+#browser{display:none;position:absolute;inset:0;padding:12px;flex-direction:column;gap:8px}
+#screenwrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:auto;background:#101010;border:1px solid #252525;border-radius:12px}
+#screen{display:block;max-width:100%;max-height:100%;object-fit:contain;cursor:crosshair}
+#typing{display:flex;gap:8px}
+#typed{flex:1;min-width:0;background:#151515;border:1px solid #303030;border-radius:9px;padding:10px;color:white;outline:none}
+#typing button{background:#191919;border:1px solid #333;color:#ddd;border-radius:9px;padding:0 14px;cursor:pointer}
+#typing button:hover{border-color:var(--accent);color:var(--accent)}
+#loading{position:absolute;inset:0;background:#080808eF;display:none;align-items:center;justify-content:center;flex-direction:column;gap:13px;color:#aaa;font-size:13px;z-index:2}
 #loading.show{display:flex}
-.spinner{width:25px;height:25px;border:2px solid #333;border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+.spinner{width:24px;height:24px;border:2px solid #333;border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-#empty-error{display:none;position:absolute;inset:0;align-items:center;justify-content:center;text-align:center;padding:25px;color:#aaa;font-size:13px;line-height:1.7;background:#080808}
-#empty-error.show{display:flex}
-#bottom-bar{height:27px;background:rgba(15,15,15,.97);border-top:1px solid #222;display:flex;align-items:center;justify-content:space-between;padding:0 12px;color:#555;font-size:10px;flex-shrink:0}
-#bottom-bar strong{color:var(--accent);font-weight:700}
-@media(max-width:650px){#status-bar{display:none}.nav-btn{width:33px;height:33px}#nav-tools{gap:5px;padding:7px}.logo{letter-spacing:-4px}.mid-search{width:100%}.tab{min-width:80px;padding:7px 9px}}
+#bottom{height:26px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;background:#101010;border-top:1px solid #222;color:#555;font-size:10px;flex-shrink:0}
+#bottom strong{color:var(--accent)}
+@media(max-width:650px){#toolbar{gap:5px;padding:7px}.nav{width:31px;height:33px}#status{display:none}#browser{padding:6px}#typing button{padding:0 10px}.logo{letter-spacing:-4px}}
 </style>
 </head>
 <body>
-<div id="tab-bar">
-  <div class="tab active" id="main-tab"><i class="fa-solid fa-house"></i><span>Drift Home</span></div>
-  <button id="add-tab" title="New tab" type="button"><i class="fa-solid fa-plus"></i></button>
+<div id="tabbar"><div class="tab"><i class="fa-solid fa-globe"></i> &nbsp;New Tab</div><button id="newtab" title="New tab"><i class="fa-solid fa-plus"></i></button></div>
+<div id="toolbar">
+<button class="nav" id="back" title="Back"><i class="fa-solid fa-arrow-left"></i></button>
+<button class="nav" id="forward" title="Forward"><i class="fa-solid fa-arrow-right"></i></button>
+<button class="nav" id="reload" title="Reload"><i class="fa-solid fa-rotate-right"></i></button>
+<button class="nav" id="homebtn" title="Home"><i class="fa-solid fa-house"></i></button>
+<input id="address" placeholder="Search or enter a website address" autocomplete="off" spellcheck="false">
+<button id="go">GO</button><span id="status">Ready</span>
 </div>
-
-<div id="nav-tools">
-  <button class="nav-btn" id="home-btn" title="Home"><i class="fa-solid fa-house"></i></button>
-  <button class="nav-btn" id="reload-btn" title="Reload remote view"><i class="fa-solid fa-rotate-right"></i></button>
-  <div id="address-wrap">
-    <input id="address" type="text" placeholder="Search or enter a website address" autocomplete="url" spellcheck="false">
-  </div>
-  <button id="go" type="button">GO</button>
-  <div id="status-bar"><span id="status-dot"></span><span id="status-text">Ready</span></div>
+<main id="main">
+<section id="home">
+<div class="logo">Drift</div><div class="sub">REMOTE CHROMIUM</div>
+<p class="desc">A browser powered by remote Chromium.</p>
+<form id="searchrow"><input id="start" placeholder="Search or enter a website address" autocomplete="off"><button id="browse">Browse <i class="fa-solid fa-arrow-right"></i></button></form>
+<div class="quicktitle">QUICK ACCESS</div>
+<div class="quick">
+<button data-url="https://www.google.com"><i class="fa-brands fa-google"></i> Google</button>
+<button data-url="https://www.wikipedia.org"><i class="fa-brands fa-wikipedia-w"></i> Wikipedia</button>
+<button data-url="https://www.youtube.com"><i class="fa-brands fa-youtube"></i> YouTube</button>
+<button data-url="https://github.com"><i class="fa-brands fa-github"></i> GitHub</button>
 </div>
-
-<main id="viewport">
-  <section id="home-view">
-    <div class="logo">Drift</div>
-    <div class="logo-sub">REMOTE CHROMIUM</div>
-    <p class="home-description">A browser powered by remote Chromium.</p>
-    <form class="mid-search" id="home-form">
-      <i class="fa-solid fa-globe"></i>
-      <input id="home-address" type="text" placeholder="Search or enter a website address" autocomplete="url" spellcheck="false">
-      <button id="home-go" type="submit">Browse <i class="fa-solid fa-arrow-right"></i></button>
-    </form>
-    <div class="quick-title">Quick access</div>
-    <div class="quick-links">
-      <button class="quick-link" data-url="https://www.google.com"><i class="fa-brands fa-google"></i> Google</button>
-      <button class="quick-link" data-url="https://www.wikipedia.org"><i class="fa-brands fa-wikipedia-w"></i> Wikipedia</button>
-      <button class="quick-link" data-url="https://www.youtube.com"><i class="fa-brands fa-youtube"></i> YouTube</button>
-    </div>
-  </section>
-
-  <section id="browser-view">
-    <iframe id="browser-frame" title="Drift remote Chromium browser" allow="clipboard-read; clipboard-write; fullscreen; autoplay" referrerpolicy="no-referrer"></iframe>
-  </section>
-
-  <div id="loading"><div class="spinner"></div><span>Starting remote Chromium…</span></div>
-  <div id="empty-error"></div>
+</section>
+<section id="browser">
+<div id="screenwrap"><img id="screen" alt="Remote Chromium browser view"></div>
+<div id="typing"><input id="typed" placeholder="Click a field on the page, then type here"><button id="send">Send</button><button id="enter">Enter</button></div>
+</section>
+<div id="loading"><div class="spinner"></div><span>Connecting to remote Chromium…</span></div>
 </main>
-
-<footer id="bottom-bar">
-  <span>Drift <strong>Remote Chromium</strong></span>
-  <span id="session-label">No active session</span>
-</footer>
-
+<footer id="bottom"><span>Drift <strong>Remote Chromium</strong></span><span id="sessionlabel">No active session</span></footer>
 <script>
 const $=id=>document.getElementById(id);
-const homeView=$("home-view");
-const browserView=$("browser-view");
-const frame=$("browser-frame");
-const loading=$("loading");
-const errorBox=$("empty-error");
-const address=$("address");
-const homeAddress=$("home-address");
-const statusText=$("status-text");
-const statusDot=$("status-dot");
-let currentSessionId=null;
-let currentUrl="";
-let lastLiveViewUrl="";
-
-function setStatus(text,online=false){
-  statusText.textContent=text;
-  statusDot.classList.toggle("online",online);
+let sessionId=null,busy=false;
+function setStatus(text){$("status").textContent=text;$("sessionlabel").textContent=text;}
+function normalize(value){value=value.trim();if(!value)return "";if(/^https?:\/\//i.test(value))return value;if(value.includes(".")&&!value.includes(" "))return "https://"+value;return "https://www.google.com/search?q="+encodeURIComponent(value);}
+function showBrowser(){ $("home").style.display="none";$("browser").style.display="flex"; }
+function showHome(){ $("browser").style.display="none";$("home").style.display="flex"; }
+function paint(data){if(data.image)$("screen").src="data:image/png;base64,"+data.image;if(data.url)$("address").value=data.url;setStatus(data.title||"Browsing");}
+async function api(path,data={}){
+ const response=await fetch("/api"+path,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(data)});
+ const result=await response.json();if(!response.ok)throw new Error(result.error||"Request failed");return result;
 }
-function normalizeAddress(value){
-  let valueTrimmed=value.trim();
-  if(!valueTrimmed)return "";
-  if(!valueTrimmed.includes(".")&&!valueTrimmed.includes("://")&&!valueTrimmed.includes("/")){
-    return "https://www.google.com/search?q="+encodeURIComponent(valueTrimmed);
-  }
-  if(!/^https?:\/\//i.test(valueTrimmed))valueTrimmed="https://"+valueTrimmed;
-  return valueTrimmed;
+async function openUrl(value){
+ if(busy)return;const url=normalize(value);if(!url)return;
+ busy=true;$("loading").classList.add("show");setStatus("Connecting…");
+ try{
+  let result;
+  if(!sessionId){result=await api("/session",{url});sessionId=result.sessionId;}
+  else result=await api("/"+sessionId+"/navigate",{url});
+  showBrowser();paint(result);
+ }catch(error){setStatus(error.message);}
+ finally{$("loading").classList.remove("show");busy=false;}
 }
-async function openWebsite(value){
-  const destination=normalizeAddress(value);
-  if(!destination)return;
-  address.value=destination;
-  homeAddress.value=destination;
-  errorBox.classList.remove("show");
-  loading.classList.add("show");
-  homeView.style.display="none";
-  browserView.classList.add("active");
-  setStatus("Connecting…");
-  $("session-label").textContent="Starting session";
-
-  try{
-    const response=await fetch("/api/open",{
-      method:"POST",
-      headers:{"content-type":"application/json"},
-      body:JSON.stringify({url:destination})
-    });
-    const data=await response.json();
-    if(!response.ok)throw new Error(data.error||"Could not start the remote browser.");
-
-    currentSessionId=data.sessionId;
-    currentUrl=data.destination||destination;
-    lastLiveViewUrl=data.liveViewUrl;
-    frame.src=lastLiveViewUrl;
-    $("session-label").textContent="Remote session active";
-    setStatus("Connected",true);
-  }catch(error){
-    browserView.classList.remove("active");
-    homeView.style.display="flex";
-    errorBox.innerHTML="<div><strong style='color:#ff657a'>Could not open the website</strong><br>"+escapeHtml(error.message)+"<br><br>Check the Worker deployment and Browser Run binding, then try again.</div>";
-    errorBox.classList.add("show");
-    setStatus("Connection failed");
-    $("session-label").textContent="No active session";
-  }finally{
-    loading.classList.remove("show");
-  }
+async function action(name,extra={}){
+ if(!sessionId||busy)return;busy=true;
+ try{paint(await api("/"+sessionId+"/action",{action:name,...extra}));}
+ catch(error){setStatus(error.message);}
+ finally{busy=false;}
 }
-function escapeHtml(value){
-  return String(value).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-}
-function showHome(){
-  browserView.classList.remove("active");
-  homeView.style.display="flex";
-  errorBox.classList.remove("show");
-  address.value="";
-  setStatus("Ready");
-}
-$("home-form").addEventListener("submit",e=>{e.preventDefault();openWebsite(homeAddress.value);});
-$("go").addEventListener("click",()=>openWebsite(address.value));
-address.addEventListener("keydown",e=>{if(e.key==="Enter")openWebsite(address.value);});
-$("home-btn").addEventListener("click",showHome);
-$("reload-btn").addEventListener("click",()=>{
-  if(lastLiveViewUrl&&browserView.classList.contains("active")){
-    frame.src=lastLiveViewUrl;
-    setStatus("Reconnecting…");
-  }else{
-    showHome();
-  }
+$("go").onclick=()=>openUrl($("address").value);
+$("address").addEventListener("keydown",event=>{if(event.key==="Enter")openUrl($("address").value);});
+$("searchrow").addEventListener("submit",event=>{event.preventDefault();openUrl($("start").value);});
+document.querySelectorAll("[data-url]").forEach(button=>button.onclick=()=>openUrl(button.dataset.url));
+$("back").onclick=()=>action("back");$("forward").onclick=()=>action("forward");$("reload").onclick=()=>action("reload");
+$("homebtn").onclick=()=>sessionId?action("home"):showHome();
+$("newtab").onclick=()=>{sessionId=null;$("screen").src="";$("address").value="";showHome();setStatus("New tab");};
+$("screen").onclick=event=>{
+ const rect=event.target.getBoundingClientRect();
+ const x=(event.clientX-rect.left)/rect.width*1280;
+ const y=(event.clientY-rect.top)/rect.height*800;
+ action("click",{x,y});
+};
+$("screenwrap").addEventListener("wheel",event=>{event.preventDefault();action("scroll",{deltaY:event.deltaY});},{passive:false});
+$("send").onclick=async()=>{const value=$("typed").value;if(value){await action("type",{text:value});$("typed").value="";}};
+$("typed").addEventListener("keydown",event=>{if(event.key==="Enter")$("send").click();});
+$("enter").onclick=()=>action("key",{key:"Enter"});
+document.addEventListener("keydown",event=>{
+ if(!sessionId||["INPUT","TEXTAREA"].includes(document.activeElement.tagName))return;
+ const keys=["Enter","Tab","Escape","Backspace","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"];
+ if(keys.includes(event.key)){event.preventDefault();action("key",{key:event.key});}
 });
-$("add-tab").addEventListener("click",showHome);
-document.querySelectorAll(".quick-link").forEach(button=>{
-  button.addEventListener("click",()=>openWebsite(button.dataset.url));
-});
-frame.addEventListener("load",()=>{
-  if(frame.src&&frame.src!=="about:blank"){
-    loading.classList.remove("show");
-    setStatus("Connected",true);
-  }
-});
+window.addEventListener("beforeunload",()=>{if(sessionId)navigator.sendBeacon("/api/"+sessionId+"/close",new Blob(["{}"],{type:"application/json"}));});
 </script>
 </body>
 </html>

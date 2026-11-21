@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#090b10">
+<title>Drift — Remote Chromium</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:#090b10;color:#f4f6fb;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;display:grid;place-items:center;padding:24px}.shell{width:min(720px,100%)}.brand{display:flex;align-items:center;gap:12px;margin-bottom:34px}.logo{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:#7c5cff;color:white;font-size:23px;font-weight:800;box-shadow:0 8px 32px #7c5cff44}.brand-name{font-size:22px;font-weight:750;letter-spacing:-.7px}.brand-sub{color:#858da1;font-size:12px;margin-top:2px}.panel{background:#11151e;border:1px solid #242b39;border-radius:22px;padding:30px;box-shadow:0 24px 80px #0007}h1{font-size:clamp(28px,5vw,42px);letter-spacing:-1.7px;margin:0 0 10px}.intro{color:#9ba4b7;line-height:1.6;margin:0 0 28px}label{display:block;color:#c7cede;font-size:13px;margin-bottom:9px}.bar{display:flex;gap:10px}input{min-width:0;flex:1;height:52px;padding:0 16px;border-radius:12px;border:1px solid #30394a;background:#090d14;color:#fff;outline:none;font-size:15px}input:focus{border-color:#8b75ff;box-shadow:0 0 0 3px #8b75ff22}button,.open-link{border:0;border-radius:12px;background:#795cff;color:white;padding:0 20px;min-height:52px;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}button:disabled{opacity:.55;cursor:wait}.status{min-height:24px;margin-top:14px;color:#aeb6c8;font-size:13px}.result{display:none;margin-top:18px;padding:18px;background:#0b1018;border:1px solid #293244;border-radius:14px}.result p{color:#aeb6c8;font-size:13px;line-height:1.5;margin:0 0 14px}.actions{display:flex;gap:10px;flex-wrap:wrap}.secondary{background:#252d3c}.note{color:#778196;font-size:12px;line-height:1.6;margin-top:22px}.footer{color:#687286;font-size:12px;text-align:center;margin-top:22px}@media(max-width:560px){.panel{padding:22px}.bar{flex-direction:column}.bar button{width:100%}}
+</style>
+</head>
+<body>
+<main class="shell">
+<div class="brand"><div class="logo">D</div><div><div class="brand-name">Drift</div><div class="brand-sub">REMOTE CHROMIUM</div></div></div>
+<section class="panel">
+<h1>Browse from anywhere.</h1>
+<p class="intro">Open a website in a remote Chromium browser powered by Cloudflare Browser Run.</p>
+<form id="openForm">
+<label for="address">Website address</label>
+<div class="bar"><input id="address" type="text" placeholder="https://example.com" autocomplete="url" spellcheck="false" required><button id="openButton" type="submit">Open website</button></div>
+</form>
+<div class="status" id="status" role="status"></div>
+<div class="result" id="result">
+<p>Your remote Chromium session is ready. Open it in a new tab to browse the site.</p>
+<div class="actions"><a class="open-link" id="launchLink" href="#" target="_blank" rel="noopener noreferrer">Open remote browser ↗</a><button class="secondary" id="closeButton" type="button">Close session</button></div>
+</div>
+<p class="note">Drift opens a remote browser session in Cloudflare's Live View. The session may close after a period of inactivity. Some websites may block remote browsers.</p>
+</section>
+<div class="footer">Drift · Remote Chromium</div>
+</main>
+<script>
+const form=document.getElementById("openForm");
+const address=document.getElementById("address");
+const openButton=document.getElementById("openButton");
+const status=document.getElementById("status");
+const result=document.getElementById("result");
+const launchLink=document.getElementById("launchLink");
+const closeButton=document.getElementById("closeButton");
+let currentSessionId=null;
+
+form.addEventListener("submit",async event=>{
+  event.preventDefault();
+  openButton.disabled=true;
+  result.style.display="none";
+  status.textContent="Starting remote Chromium…";
+  try{
+    const response=await fetch("/api/open",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({url:address.value})});
+    const data=await response.json();
+    if(!response.ok)throw new Error(data.error||"Could not open that website.");
+    currentSessionId=data.sessionId;
+    launchLink.href=data.liveViewUrl;
+    result.style.display="block";
+    status.textContent="Remote browser ready for "+data.destination;
+  }catch(error){status.textContent=error.message;}
+  finally{openButton.disabled=false;}
+});
+
+closeButton.addEventListener("click",async()=>{
+  if(!currentSessionId)return;
+  closeButton.disabled=true;
+  status.textContent="Closing remote browser…";
+  try{
+    const response=await fetch("/api/close",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({sessionId:currentSessionId})});
+    const data=await response.json();
+    if(!response.ok)throw new Error(data.error||"Could not close the session.");
+    currentSessionId=null;
+    result.style.display="none";
+    status.textContent="Remote browser session closed.";
+  }catch(error){status.textContent=error.message;}
+  finally{closeButton.disabled=false;}
+});
+</script>
+</body>
+</html>

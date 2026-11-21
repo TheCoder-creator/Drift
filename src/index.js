@@ -1,78 +1,74 @@
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
-    headers: { "content-type": "application/json; charset=utf-8" }
+    headers: {
+      "content-type": "application/json; charset=utf-8",
+      "cache-control": "no-store"
+    }
   });
-}
-
-function normalizeUrl(value) {
-  let input = String(value || "").trim();
-  if (!input) throw new Error("Enter a website address.");
-  if (!/^https?:\/\//i.test(input)) input = "https://" + input;
-  const parsed = new URL(input);
-  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
-    throw new Error("Only HTTP and HTTPS websites are supported.");
-  }
-  return parsed.href;
 }
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    if (url.pathname === "/api/open") {
-      if (request.method !== "POST") return json({ error: "Use POST for this endpoint." }, 405);
-      let body;
-      try { body = await request.json(); }
-      catch { return json({ error: "Invalid request." }, 400); }
+    if (!url.pathname.startsWith("/api/")) {
+      return env.ASSETS.fetch(request);
+    }
 
-      let destination;
-      try { destination = normalizeUrl(body.url); }
-      catch (error) { return json({ error: error.message }, 400); }
+    if (request.method !== "POST") {
+      return json({ error: "Only POST requests are supported." }, 405);
+    }
 
-      let session;
-      try {
-        session = await env.BROWSER.acquire({
-          keepAlive: 600000,
-          targets: true,
-          liveViewUrlExpiresInMs: 3600000
-        });
-        const target = await env.BROWSER.devtools.newTarget(session.sessionId, destination);
-        const liveView = await env.BROWSER.getLiveView(session.sessionId, {
-          targetId: target.id,
-          mode: "tab"
-        });
-        return json({
-          sessionId: session.sessionId,
-          liveViewUrl: liveView.devtoolsFrontendUrl,
-          destination
-        });
-      } catch {
-        if (session?.sessionId) {
-          await env.BROWSER.closeSession(session.sessionId).catch(() => {});
+    if (!env.BROWSER_SERVER_URL || !env.BROWSER_SERVER_SECRET) {
+      return json({ error: "Drift's Chromium server has not been connected yet." }, 503);
+    }
+
+    let serverUrl;
+    try {
+      serverUrl = new URL(env.BROWSER_SERVER_URL);
+      if (serverUrl.protocol !== "https:" || serverUrl.username || serverUrl.password) {
+        throw new Error("Invalid server URL");
+      }
+    } catch {
+      return json({ error: "The Chromium server URL must be a valid HTTPS address." }, 503);
+    }
+
+    const path = url.pathname;
+    if (!/^\/api\/(session|[a-f0-9]{48}\/(navigate|action|close))$/.test(path)) {
+      return json({ error: "Unknown Drift API endpoint." }, 404);
+    }
+
+    let body = "";
+    try {
+      body = await request.text();
+      if (body.length > 32768) return json({ error: "Request is too large." }, 413);
+    } catch {
+      return json({ error: "Could not read request." }, 400);
+    }
+
+    try {
+      const upstream = await fetch(new URL(path + url.search, serverUrl.origin), {
+        method: "POST",
+        headers: {
+          "authorization": `Bearer ${env.BROWSER_SERVER_SECRET}`,
+          "content-type": "application/json",
+          "x-client-ip": request.headers.get("CF-Connecting-IP") || "unknown"
+        },
+        body
+      });
+
+      return new Response(upstream.body, {
+        status: upstream.status,
+        headers: {
+          "content-type": upstream.headers.get("content-type") || "application/json",
+          "cache-control": "no-store"
         }
-        return json({
-          error: "Could not start the remote browser. Check that Browser Run is enabled for this Cloudflare account and try again."
-        }, 502);
-      }
+      });
+    } catch {
+      return json({
+        error: "Could not reach the Chromium server. It may be starting or temporarily unavailable."
+      }, 502);
     }
-
-    if (url.pathname === "/api/close") {
-      if (request.method !== "POST") return json({ error: "Use POST for this endpoint." }, 405);
-      let body;
-      try { body = await request.json(); }
-      catch { return json({ error: "Invalid request." }, 400); }
-      if (!body.sessionId || typeof body.sessionId !== "string") {
-        return json({ error: "Missing session ID." }, 400);
-      }
-      try {
-        const result = await env.BROWSER.closeSession(body.sessionId);
-        return json({ closed: true, result });
-      } catch {
-        return json({ error: "Could not close that browser session." }, 502);
-      }
-    }
-
-    return env.ASSETS.fetch(request);
   }
 };

@@ -12,6 +12,43 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
+    if (url.pathname === "/health") {
+      if (request.method !== "GET") {
+        return json({ error: "Only GET requests are supported." }, 405);
+      }
+
+      if (!env.BROWSER_SERVER_URL || !env.BROWSER_SERVER_SECRET) {
+        return json({ ok: false, error: "Drift's Chromium server has not been connected yet." }, 503);
+      }
+
+      try {
+        const serverUrl = new URL(env.BROWSER_SERVER_URL);
+        if (serverUrl.protocol !== "https:" || serverUrl.username || serverUrl.password) {
+          throw new Error("Invalid server URL");
+        }
+
+        const upstream = await fetch(new URL("/health", serverUrl.origin), {
+          method: "GET",
+          headers: {
+            "authorization": `Bearer ${env.BROWSER_SERVER_SECRET}`
+          }
+        });
+
+        return new Response(upstream.body, {
+          status: upstream.status,
+          headers: {
+            "content-type": upstream.headers.get("content-type") || "application/json",
+            "cache-control": "no-store"
+          }
+        });
+      } catch {
+        return json({
+          ok: false,
+          error: "Could not reach the Chromium server. It may be starting or temporarily unavailable."
+        }, 502);
+      }
+    }
+
     if (!url.pathname.startsWith("/api/")) {
       return env.ASSETS.fetch(request);
     }

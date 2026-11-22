@@ -71,8 +71,8 @@ export default {
       return json({ error: "The Chromium server URL must be a valid HTTPS address." }, 503);
     }
 
-    const path = url.pathname;
-    if (!/^\/api\/(session|[a-f0-9]{48}\/(navigate|action|close))$/.test(path)) {
+    const path = url.pathname.replace(/\/$/, "");
+    if (!/^\/api\/(session|[a-f0-9]{48}\/(navigate|action|close))$/i.test(path)) {
       return json({ error: "Unknown Drift API endpoint." }, 404);
     }
 

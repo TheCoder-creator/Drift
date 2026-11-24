@@ -88,7 +88,7 @@ function setStatus(text){$("status").textContent=text;$("sessionlabel").textCont
 function normalize(value){value=value.trim();if(!value)return "";if(/^https?:\/\//i.test(value))return value;if(value.includes(".")&&!value.includes(" "))return "https://"+value;return "https://www.google.com/search?q="+encodeURIComponent(value);}
 function showBrowser(){ $("home").style.display="none";$("browser").style.display="flex"; }
 function showHome(){ $("browser").style.display="none";$("home").style.display="flex"; }
-function paint(data){if(data.image)$("screen").src="data:image/png;base64,"+data.image;if(data.url)$("address").value=data.url;setStatus(data.title||"Browsing");}
+function paint(data){if(data.image)$("screen").src="data:image/png;base64,"+data.image;if(data.url)$("address").value=data.url;setStatus((data.title||"Browsing")+(data.provider?" · "+data.provider:""));}
 async function api(path,data={}){
  const response=await fetch("/api"+path,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(data)});
  const result=await response.json();if(!response.ok)throw new Error(result.error||"Request failed");return result;
@@ -132,7 +132,7 @@ document.addEventListener("keydown",event=>{
  const keys=["Enter","Tab","Escape","Backspace","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"];
  if(keys.includes(event.key)){event.preventDefault();action("key",{key:event.key});}
 });
-window.addEventListener("beforeunload",()=>{if(sessionId)navigator.sendBeacon("/api/"+sessionId+"/close",new Blob(["{}"],{type:"application/json"}));});
+window.addEventListener("pagehide",()=>{if(sessionId)navigator.sendBeacon("/api/"+sessionId+"/close",new Blob(["{}"],{type:"application/json"}));});
 </script>
 </body>
 </html>

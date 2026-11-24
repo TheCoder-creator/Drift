@@ -116,7 +116,7 @@ $("searchrow").addEventListener("submit",event=>{event.preventDefault();openUrl(
 document.querySelectorAll("[data-url]").forEach(button=>button.onclick=()=>openUrl(button.dataset.url));
 $("back").onclick=()=>action("back");$("forward").onclick=()=>action("forward");$("reload").onclick=()=>action("reload");
 $("homebtn").onclick=()=>sessionId?action("home"):showHome();
-$("newtab").onclick=()=>{sessionId=null;$("screen").src="";$("address").value="";showHome();setStatus("New tab");};
+$("newtab").onclick=()=>{if(sessionId)navigator.sendBeacon("/api/"+sessionId+"/close",new Blob(["{}"],{type:"application/json"}));sessionId=null;$("screen").src="";$("address").value="";showHome();setStatus("New tab");};
 $("screen").onclick=event=>{
  const rect=event.target.getBoundingClientRect();
  const x=(event.clientX-rect.left)/rect.width*1280;

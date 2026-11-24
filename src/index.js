@@ -214,7 +214,7 @@ export default {
         body: JSON.stringify(body),
         signal: AbortSignal.timeout(10000)
       });
-      if (upstream.ok || upstream.status < 500 && upstream.status !== 429) {
+      if (upstream.ok || (upstream.status < 500 && ![404, 408, 429].includes(upstream.status))) {
         return new Response(upstream.body, {
           status: upstream.status,
           headers: {
